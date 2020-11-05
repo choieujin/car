@@ -1,0 +1,106 @@
+server:
+  port: 8080
+---
+
+spring:
+  profiles: default
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDB53Dialect
+    #hibernate:
+    #  ddl-auto: create #create update none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  datasource:
+    url: jdbc:mariadb://${receipt.db.url}:3306/receipt?useSSL=true
+    username: ${receipt.db.username}
+    password: ${receipt.db.passoword}
+    #url: jdbc:mysql://localhost:3306/security?serverTimezone=Asia/Seoul
+    #username: cos
+    #password: cos1234
+    driverClassName: org.mariadb.jdbc.Driver
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+        streams:
+          binder:
+            configuration:
+              default:
+                key:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        event-in:
+          group: receipt
+          destination: automechanicsmall
+          contentType: application/json
+        event-out:
+          destination: automechanicsmall
+          contentType: application/json
+
+logging:
+  level:
+    org.hibernate.type: trace
+    org.springframework.cloud: debug
+server:
+  port: 8081
+
+
+api:
+  repair:
+    url: http://localhost:8082
+
+  payment:
+    url: http://localhost:8083
+---
+
+spring:
+  profiles: docker
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDB53Dialect
+    #hibernate:
+    #  ddl-auto: create #create update none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  datasource:
+    url: jdbc:mariadb://${receipt.db.url}:3306/receipt?useSSL=true
+    username: ${receipt.db.username}
+    password: ${receipt.db.passoword}
+    #url: jdbc:mysql://localhost:3306/security?serverTimezone=Asia/Seoul
+    #username: cos
+    #password: cos1234
+    driverClassName: org.mariadb.jdbc.Driver
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: 20.196.153.211:9092
+        streams:
+          binder:
+            configuration:
+              default:
+                key:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+                value:
+                  serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      bindings:
+        event-in:
+          group: receipt
+          destination: automechanicsmall
+          contentType: application/json
+        event-out:
+          destination: automechanicsmall
+          contentType: application/json
+
+api:
+  repair:
+    url: http://repair:8080
+
+  payment:
+    url: http://payment:8080
